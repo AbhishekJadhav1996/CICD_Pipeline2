@@ -3,11 +3,11 @@ pipeline {
         label 'windows_Node'
     }
 
-    tools {
-        maven 'Maven'  // Name of your Maven installation in Jenkins
-        jdk 'JDK11'    // Name of your JDK installation in Jenkins
-        git 'Default' 
-    }
+  tools {
+  git 'Default'
+  jdk 'JDK11'
+  maven 'Maven'
+}
 
     stages {
         stage('Clone Repository') {

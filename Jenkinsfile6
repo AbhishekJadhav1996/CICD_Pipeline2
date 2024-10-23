@@ -1,1 +1,67 @@
+pipeline {
+    agent any // This allows the pipeline to run on any available agent.
 
+    tools {
+        maven "Maven" // Ensure Maven is configured in Jenkins
+        jdk "JDK11"   // Ensure JDK is configured in Jenkins
+    }
+
+    stages {
+        stage('Checkout') {
+            steps {
+                echo "PATH = ${M2_HOME}/bin:${PATH}"
+                echo "M2_HOME = /opt/maven"
+            }
+        }
+
+        stage('Build') {
+            steps {
+                echo "BUILD"
+                bat "mvn clean install" // Changed to `clean install` for building and installing dependencies
+            }
+        }
+
+        stage('Test') {
+            steps {
+                echo "TEST"
+                bat "mvn clean test" // Make sure the tests are cleaned and run
+            }
+        }
+
+        stage('Sonar Analysis') {
+            steps {
+                echo "SONAR ANALYSIS"
+                // Use the SonarQube Scanner to analyze the project
+                withSonarQubeEnv('SonarQube') {
+                    bat 'mvn sonar:sonar'
+                }
+            }
+        }
+
+        stage('Package') {
+            steps {
+                echo "PACKAGE"
+                bat "mvn package" // This should create the JAR file
+            }
+        }
+
+        stage('Archive Artifact') {
+            steps {
+                script {
+                    // Specify the path of the JAR file
+                    def jarFilePath = 'target/JacocoExample-0.0.1-SNAPSHOT.jar'
+                    
+                    // Archive the JAR file
+                    archiveArtifacts artifacts: jarFilePath, fingerprint: true
+                }
+            }
+        }
+    }
+
+    post {
+        always {
+            echo "Pipeline completed."
+            // Optionally add notifications or clean up steps here
+        }
+    }
+}

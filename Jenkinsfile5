@@ -1,21 +1,12 @@
 pipeline {
-    agent {
-        label 'windows_Node'
+    agent any
+
+    tools {
+        maven "Maven"
+        jdk "JDK11"
     }
 
-  tools {
-  git 'Default'
-  jdk 'JDK11'
-  maven 'Maven'
-}
-
     stages {
-        stage('Clone Repository') {
-            steps {
-                git url: 'https://github.com/AbhishekJadhav1996/CICD_Pipeline2.git', branch: 'master'
-            }
-        }
-
         stage('Initialize') {
             steps {
                 echo "PATH = ${M2_HOME}/bin:${PATH}"
@@ -46,7 +37,7 @@ pipeline {
 
         stage('Sonar Analysis') {
             steps {
-                // Use the SonarQube Scanner to analyze the project
+                // use the SonarQube Scanner to analyze the project
                 withSonarQubeEnv('SonarQube') {
                     bat 'mvn sonar:sonar'
                 }

@@ -1,0 +1,92 @@
+pipeline {
+    agent {
+        label 'windows_Node'
+    }
+
+    tools {
+        maven 'Maven'  // Name of your Maven installation in Jenkins
+        jdk 'JDK11'    // Name of your JDK installation in Jenkins
+    }
+
+    stages {
+        stage('Clone Repository') {
+            steps {
+                git url: 'https://github.com/AbhishekJadhav1996/CICD_Pipeline2.git', branch: 'master'
+            }
+        }
+
+        stage('Initialize') {
+            steps {
+                echo "PATH = ${M2_HOME}/bin:${PATH}"
+                echo "M2_HOME = /opt/maven"
+            }
+        }
+
+        stage('Validate') {
+            steps {
+                echo "VALIDATE"
+                bat "mvn validate"
+            }
+        }
+
+        stage('Compile') {
+            steps {
+                echo "COMPILE"
+                bat "mvn compile"
+            }
+        }
+
+        stage('Test') {
+            steps {
+                echo "Test"
+                bat "mvn clean test"
+            }
+        }
+
+        stage('Sonar Analysis') {
+            steps {
+                // Use the SonarQube Scanner to analyze the project
+                withSonarQubeEnv('SonarQube') {
+                    bat 'mvn sonar:sonar'
+                }
+            }
+        }
+
+        stage('Package') {
+            steps {
+                echo "PACKAGE"
+                bat "mvn package"
+            }
+        }
+
+        stage('Install') {
+            steps {
+                echo "INSTALL"
+                bat "mvn clean install"
+            }
+        }
+
+        stage('Upload_Artifact') {
+            steps {
+                script {
+                    def server = Artifactory.server 'artifactory'
+                    def uploadSpec = """{
+                        "files": [
+                            {
+                                "pattern": "target/*.jar",
+                                "target": "CI_2_POC/"
+                            }
+                        ]
+                    }"""
+                    server.upload(uploadSpec)
+                }
+            }
+        }
+    }
+
+    post {
+        always {
+            jiraSendBuildInfo site: 'abhisheknewjirasite.atlassian.net', branch: 'master'
+        }
+    }
+}

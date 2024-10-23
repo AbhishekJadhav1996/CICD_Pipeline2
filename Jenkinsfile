@@ -1,5 +1,5 @@
 pipeline {
-         agent any
+         agent windows_Node
          tools {
                   maven "Maven"
                   jdk "JDK11"

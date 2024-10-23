@@ -76,9 +76,4 @@ pipeline {
         }
     }
 
-    post {
-        always {
-            jiraSendBuildInfo site: 'abhisheknewjirasite.atlassian.net', branch: 'master'
-        }
-    }
 }

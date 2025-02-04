@@ -1,0 +1,54 @@
+pipeline {
+    agent {
+        label 'abhi-linux'
+    }
+
+    tools {
+      git "git"  
+      maven "maven"
+    }
+
+    stages {
+        stage('Initialize') {
+            steps {
+                echo "PATH = ${M2_HOME}/bin:${PATH}"
+                echo "M2_HOME = /opt/maven"
+            }
+        }
+
+        stage('Validate') {
+            steps {
+                echo "VALIDATE"
+                sh "mvn validate"
+            }
+        }
+
+        stage('Compile') {
+            steps {
+                echo "COMPILE"
+                sh "mvn compile"
+            }
+        }
+
+        stage('Test') {
+            steps {
+                echo "Test"
+                sh "mvn clean test"
+            }
+        }
+
+        stage('Package') {
+            steps {
+                echo "PACKAGE"
+                sh "mvn package"
+            }
+        }
+
+        stage('Install') {
+            steps {
+                echo "INSTALL"
+                sh "mvn clean install"
+            }
+        }
+    }
+}

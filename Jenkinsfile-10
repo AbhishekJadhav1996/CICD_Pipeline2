@@ -1,11 +1,26 @@
 pipeline {
     agent { label 'abhi-linux' } // Runs on Linux agent
 
+    parameters {
+        string(name: 'BRANCH_NAME', defaultValue: 'master', description: 'Git branch to build')
+    }
+
     stages {
+        stage('Validate Branch') {
+            steps {
+                script {
+                    if (!(BRANCH_NAME == 'master' || BRANCH_NAME == 'C2-1-Login-Page')) {
+                        error "Invalid branch: ${BRANCH_NAME}. Only 'master' and 'C2-1-Login-Page' are allowed."
+                    }
+                }
+            }
+        }
+
         stage('Build') {
             steps {
-                echo "Building application from branch: master"
+                echo "Building application from branch: ${BRANCH_NAME}"
                 sh '''
+                    git clone --depth 1 -b ${BRANCH_NAME} https://github.com/AbhishekJadhav1996/CICD_Pipeline2.git
                     cd CICD_Pipeline2
                     mvn clean package
                 '''
@@ -14,7 +29,7 @@ pipeline {
 
         stage('Test') {
             steps {
-                echo "Running tests on branch: C2-1-Login-Page"
+                echo "Running tests on branch: ${BRANCH_NAME}"
                 sh '''
                     cd CICD_Pipeline2
                     mvn test
@@ -24,3 +39,4 @@ pipeline {
 
     }
 }
+

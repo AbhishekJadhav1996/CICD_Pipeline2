@@ -40,29 +40,6 @@ pipeline {
             }
         }
 
-        stage('Use Build Cache') {
-            steps {
-                script {
-                    if (fileExists("${BUILD_CACHE}/dependencies")) {
-                        echo 'Cache found, using cached dependencies...'
-                        sh 'cp -r ${BUILD_CACHE}/dependencies ./'
-                    } else {
-                        echo 'No cache found, downloading dependencies...'
-                        sh 'mvn dependency:resolve'
-                        sh 'mkdir -p ${BUILD_CACHE} && cp -r target/dependency ${BUILD_CACHE}/dependencies'
-                    }
-                }
-            }
-        }
-
-
-        stage('Deploy') {
-            steps {
-                echo 'Deploying application to production...'
-                sh './deploy.sh'
-            }
-        }
-    }
 
     post {
         success {

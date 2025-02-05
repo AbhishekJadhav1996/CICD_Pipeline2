@@ -5,14 +5,12 @@ pipeline {
     environment {
         APP_ENV = 'production'
         BUILD_CACHE = '/home/jenkins/cache'  // Example cache location
-        SECRET_KEY = credentials('my-secret-key')  // Secure credential from Jenkins
     }
 
     stages {
         stage('Initialize') {
             steps {
                 echo "Running in environment: ${APP_ENV}"
-                echo "Using secret key (hidden)"
             }
         }
 

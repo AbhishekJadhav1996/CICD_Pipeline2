@@ -1,0 +1,61 @@
+pipeline {
+    agent { label 'abhi-linux' } // Runs on Linux agent
+
+    parameters {
+        string(name: 'BRANCH_NAME', defaultValue: 'main', description: 'Git branch to build')
+    }
+
+    environment {
+        GIT_REPO = 'https://github.com/your-org/your-repo.git' // Change to your repo
+    }
+
+    options {
+        timeout(time: 30, unit: 'MINUTES')
+    }
+
+    stages {
+        stage('Checkout Code') {
+            steps {
+                script {
+                    withCredentials([usernamePassword(credentialsId: 'git-cred', usernameVariable: 'GIT_USER', passwordVariable: 'GIT_PASS')]) {
+                        sh '''
+                            echo "Cloning branch: ${BRANCH_NAME}"
+                            git clone --depth 1 -b ${BRANCH_NAME} https://${GIT_USER}:${GIT_PASS}@github.com/your-org/your-repo.git
+                            cd your-repo
+                        '''
+                    }
+                }
+            }
+        }
+
+        stage('Build') {
+            steps {
+                echo "Building application from branch: ${BRANCH_NAME}"
+                sh 'mvn clean package'
+            }
+        }
+
+        stage('Test') {
+            steps {
+                echo "Running tests on branch: ${BRANCH_NAME}"
+                sh 'mvn test'
+            }
+        }
+
+        stage('Deploy') {
+            steps {
+                echo "Deploying branch: ${BRANCH_NAME}"
+                sh './deploy.sh' // Replace with actual deployment command
+            }
+        }
+    }
+
+    post {
+        success {
+            echo "Build and deployment successful for branch: ${BRANCH_NAME}"
+        }
+        failure {
+            echo "Build failed for branch: ${BRANCH_NAME}"
+        }
+    }
+}

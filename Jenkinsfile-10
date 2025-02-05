@@ -23,13 +23,4 @@ pipeline {
         }
 
     }
-
-    post {
-        success {
-            echo "Build and deployment successful for branch: ${BRANCH_NAME}"
-        }
-        failure {
-            echo "Build failed for branch: ${BRANCH_NAME}"
-        }
-    }
 }

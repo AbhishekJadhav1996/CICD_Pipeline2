@@ -1,0 +1,77 @@
+pipeline {
+    agent any  // Runs on any available agent
+
+    // Define environment variables
+    environment {
+        APP_ENV = 'production'
+        BUILD_CACHE = '/home/jenkins/cache'  // Example cache location
+        SECRET_KEY = credentials('my-secret-key')  // Secure credential from Jenkins
+    }
+
+    stages {
+        stage('Initialize') {
+            steps {
+                echo "Running in environment: ${APP_ENV}"
+                echo "Using secret key (hidden)"
+            }
+        }
+
+        stage('Parallel Execution') {
+            parallel {
+                stage('Build on Agent 1') {
+                    agent { label 'agent-1' }
+                    steps {
+                        echo 'Building application on Agent 1...'
+                        sh 'mvn clean package'
+                    }
+                }
+                stage('Test on Agent 2') {
+                    agent { label 'agent-2' }
+                    steps {
+                        echo 'Running tests on Agent 2...'
+                        sh 'mvn test'
+                    }
+                }
+                stage('Security Scan on Agent 3') {
+                    agent { label 'agent-3' }
+                    steps {
+                        echo 'Performing security scan on Agent 3...'
+                        sh 'bash security_scan.sh'
+                    }
+                }
+            }
+        }
+
+        stage('Use Build Cache') {
+            steps {
+                script {
+                    if (fileExists("${BUILD_CACHE}/dependencies")) {
+                        echo 'Cache found, using cached dependencies...'
+                        sh 'cp -r ${BUILD_CACHE}/dependencies ./'
+                    } else {
+                        echo 'No cache found, downloading dependencies...'
+                        sh 'mvn dependency:resolve'
+                        sh 'mkdir -p ${BUILD_CACHE} && cp -r target/dependency ${BUILD_CACHE}/dependencies'
+                    }
+                }
+            }
+        }
+
+
+        stage('Deploy') {
+            steps {
+                echo 'Deploying application to production...'
+                sh './deploy.sh'
+            }
+        }
+    }
+
+    post {
+        success {
+            echo 'Build and deployment successful!'
+        }
+        failure {
+            echo 'Build failed. Sending alert...'
+        }
+    }
+}

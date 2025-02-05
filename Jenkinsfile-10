@@ -10,31 +10,24 @@ pipeline {
     }
 
     stages {
-        stage('Checkout Code') {
-            steps {
-                script {
-                    withCredentials([usernamePassword(credentialsId: 'git-cred', usernameVariable: 'GIT_USER', passwordVariable: 'GIT_PASS')]) {
-                        sh '''
-                            echo "Cloning branch: ${BRANCH_NAME}"
-                            git clone --depth 1 -b ${BRANCH_NAME} https://${GIT_USER}:${GIT_PASS}@github.com/AbhishekJadhav1996/CICD_Pipeline2.git
-                            cd CICD_Pipeline2
-                        '''
-                    }
-                }
-            }
-        }
-
         stage('Build') {
             steps {
-                echo "Building application from branch: ${C2-1-Login-Page}"
-                sh 'mvn clean package'
+                echo "Building application from branch: ${master}"
+                sh '''
+                    git clone --depth 1 -b ${BRANCH_NAME} https://github.com/AbhishekJadhav1996/CICD_Pipeline2.git
+                    cd CICD_Pipeline2
+                    mvn clean package
+                '''
             }
         }
 
         stage('Test') {
             steps {
-                echo "Running tests on branch: ${C2-2-Registration-Page}"
-                sh 'mvn test'
+                echo "Running tests on branch: ${C2-1-Login-Page}"
+                sh '''
+                    cd CICD_Pipeline2
+                    mvn test
+                '''
             }
         }
 

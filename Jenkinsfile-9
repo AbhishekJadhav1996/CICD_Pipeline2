@@ -19,21 +19,21 @@ pipeline {
         stage('Parallel Execution') {
             parallel {
                 stage('Build on Agent 1') {
-                    agent { label 'agent-1' }
+                    agent { label 'abhi-linux' }
                     steps {
                         echo 'Building application on Agent 1...'
                         sh 'mvn clean package'
                     }
                 }
                 stage('Test on Agent 2') {
-                    agent { label 'agent-2' }
+                    agent { label 'abhi-linux' }
                     steps {
                         echo 'Running tests on Agent 2...'
                         sh 'mvn test'
                     }
                 }
                 stage('Security Scan on Agent 3') {
-                    agent { label 'agent-3' }
+                    agent { label 'abhi-linux' }
                     steps {
                         echo 'Performing security scan on Agent 3...'
                         sh 'bash security_scan.sh'

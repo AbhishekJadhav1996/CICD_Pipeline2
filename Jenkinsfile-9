@@ -17,21 +17,21 @@ pipeline {
         stage('Parallel Execution') {
             parallel {
                 stage('Build on Agent 1') {
-                    agent { label 'abhi-linux' }
+                    agent { label 'abhi-linux-1' }  // Ensure different agent if parallel execution is needed
                     steps {
                         echo 'Building application on Agent 1...'
                         sh 'mvn clean package'
                     }
                 }
                 stage('Test on Agent 2') {
-                    agent { label 'abhi-linux' }
+                    agent { label 'abhi-linux-2' }  // Ensure different agent
                     steps {
                         echo 'Running tests on Agent 2...'
                         sh 'mvn test'
                     }
                 }
                 stage('Security Scan on Agent 3') {
-                    agent { label 'abhi-linux' }
+                    agent { label 'abhi-linux-3' }  // Ensure different agent
                     steps {
                         echo 'Performing security scan on Agent 3...'
                         sh 'bash security_scan.sh'
@@ -39,7 +39,7 @@ pipeline {
                 }
             }
         }
-
+    }
 
     post {
         success {
@@ -49,4 +49,4 @@ pipeline {
             echo 'Build failed. Sending alert...'
         }
     }
-
+}

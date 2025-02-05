@@ -1,20 +1,11 @@
 pipeline {
     agent { label 'abhi-linux' } // Runs on Linux agent
 
-    parameters {
-        string(name: 'BRANCH_NAME', defaultValue: 'master', description: 'Git branch to build')
-    }
-
-    options {
-        timeout(time: 30, unit: 'MINUTES')
-    }
-
     stages {
         stage('Build') {
             steps {
-                echo "Building application from branch: ${master}"
+                echo "Building application from branch: master"
                 sh '''
-                    git clone --depth 1 -b ${BRANCH_NAME} https://github.com/AbhishekJadhav1996/CICD_Pipeline2.git
                     cd CICD_Pipeline2
                     mvn clean package
                 '''
@@ -23,7 +14,7 @@ pipeline {
 
         stage('Test') {
             steps {
-                echo "Running tests on branch: ${C2-1-Login-Page}"
+                echo "Running tests on branch: C2-1-Login-Page"
                 sh '''
                     cd CICD_Pipeline2
                     mvn test
